@@ -1,22 +1,29 @@
 <script setup lang="ts">
+import axios from 'axios'
+
 interface SignupForm {
-  email: string|null;
-  password: string|null;
-  passwordConfirm: string|null;
+  name: string
+  email: string;
+  password: string;
+  passwordConfirm: string;
   errors: string[];
 }
 const form:SignupForm = {
-  email: null,
-  password: null,
-  passwordConfirm: null,
+  name: '',
+  email: '',
+  password: '',
+  passwordConfirm: '',
   errors: []
 }
 
 function checkForm() {
-  if (form.email && form.password && form.passwordConfirm) {
+  if (form.name && form.email && form.password && form.passwordConfirm) {
     return true
   }
   form.errors = [];
+  if (!form.name) {
+    form.errors.push('Name required!');
+  }
   if (!form.email) {
     form.errors.push('Email required!');
   }
@@ -26,6 +33,20 @@ function checkForm() {
   if (form.password !== form.passwordConfirm) {
     form.errors.push('Password must match!');
   }
+}
+
+function signup() {
+  axios.post('http://127.0.0.1:8000/api/signup', {
+    name: form.name,
+    email: form.email,
+    password: form.password,
+    password_confirmation: form.passwordConfirm,
+  }).then(function (response) {
+    console.log(response);
+    // se connecter + rediriger sur home
+  }).catch(function (error) {
+    console.log(error);
+  })
 }
 </script>
 
@@ -37,26 +58,29 @@ function checkForm() {
       <li v-for="error in form.errors" v-bind:key="error">{{ error }}</li>
     </ul>
   </p>
-  <form id="signup-form" method="POST" action="http://127.0.0.1:8000/signup" @submit="checkForm">
+  <form id="signup-form" method="POST" action="" @submit="checkForm">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input v-model="form.name" class="border border-blue-2" name="name" id="name" type="text" />
+    </div>
     <div class="form-group">
       <label for="email">Email</label>
       <input v-model="form.email" class="border border-blue-2" name="email" id="email" type="email" />
     </div>
     <div class="form-group">
       <label for="password">Password</label>
-      <input v-model="form.password" class="border border-blue-2" name="password" id="password" type="password" />
+      <input v-model="form.password" class="border border-blue-2" name="password" id="password" />
     </div>
     <div class="form-group">
       <label for="password-confirm">Confirm password</label>
       <input
-        v-model="form.passwordConfirmation"
+        v-model="form.passwordConfirm"
         class="border border-blue-2"
         name="password-confirm"
         id="password-confirm"
-        type="password"
       />
     </div>
-    <input type="submit" value="Signup">
+    <input type="submit" value="Signup" @click.prevent="signup">
   </form>
 </template>
 
