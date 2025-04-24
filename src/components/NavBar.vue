@@ -11,7 +11,7 @@ function logout() {
       user_id: user.userId
     },
     headers: {
-      Authorization: `Bearer ${user.userToken}`,
+      Authorization: store.getBearerToken,
       Accept: 'application/json'
     },
   }).then(function() {

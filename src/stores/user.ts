@@ -5,7 +5,8 @@ export const useUserStore = defineStore('user', {
     return {
       // for data that is not yet loaded
       userToken: '',
-      userId: ''
+      userId: '',
+      userBearerToken: '',
     }
   },
   getters: {
@@ -14,6 +15,9 @@ export const useUserStore = defineStore('user', {
     },
     getUser(state) {
       return state
+    },
+    getBearerToken(): string {
+      return this.userBearerToken
     }
   },
   actions: {
@@ -22,6 +26,9 @@ export const useUserStore = defineStore('user', {
     },
     setUserId(id: string) {
       this.userId = id
+    },
+    setBearerToken(token: string) {
+      this.userBearerToken = `Bearer ${token}`
     },
     logout() {
       this.userToken = ''
