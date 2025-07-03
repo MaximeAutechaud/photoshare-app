@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import ModalItem from '@/components/ModalItem.vue'
 import { ref, onMounted, useTemplateRef, onUpdated } from 'vue'
+import { useUserStore } from '@/stores/user.ts'
+import axios from 'axios'
 
 const isModalOpened = ref<boolean>(false)
+
+const store = useUserStore();
+const user = store.getUser;
+let medias = [];
 
 const openModal = () => {
   isModalOpened.value = true
@@ -16,6 +22,7 @@ const submitHandler = () => {
 }
 const modalRef = useTemplateRef("modal-ref")
 onMounted(() => {
+  fetchGallery();
 })
 onUpdated(() => {
   if (modalRef.value?.dropContainer) {
@@ -37,12 +44,26 @@ onUpdated(() => {
     }
   }
 })
-
+function fetchGallery() {
+  axios.get('http://127.0.0.1:8000/api/fetch-gallery', {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': store.getBearerToken,
+    }
+  })
+    .then(function (response) {
+      medias = response.data;
+      console.log(response.data)
+  }).catch(function (error) {
+    console.log(error);
+  })
+}
 </script>
 
 <template>
   <div class="mt-20">
     <h2 class="text-3xl">This is Home view</h2>
+    <p>Bonjour {{ user.name }}</p>
     <div class="text-center">
       <button
         @click="openModal"
@@ -60,6 +81,18 @@ onUpdated(() => {
       ref="modal-ref"
     >
     </ModalItem>
+    <div v-for="media in medias" v-bind:key="media.id">
+      <div v-if="media.mime_type.startsWith('image')" >
+        <p>{{ media.name }}</p>
+        <img :src="media.s3_url" alt="Image" class="rounded shadow mb-2 w-full max-w-md">
+      </div>
+      <div v-else>
+        <p>{{ media.name }}</p>
+        <video controls class="rounded shadow w-full max-w-sm">
+          <source :src="media.s3_url" :type="media.mime_type" />
+        </video>
+      </div>
+    </div>
   </div>
 </template>
 <style>

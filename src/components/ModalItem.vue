@@ -1,15 +1,54 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, useTemplateRef } from 'vue'
+import Resumable from 'resumablejs';
+import { defineProps, defineEmits, ref, useTemplateRef, watch } from 'vue'
+import { useUserStore } from '@/stores/user.ts'
 
 const props = defineProps({
   isOpen: Boolean,
 })
 
-const emit = defineEmits(['modal-close'])
+const files = ref<File[]>([]);
+const store = useUserStore();
 
+//const emit = defineEmits(['modal-close', (e: "changed", file: File[]): void])
+const emit = defineEmits<{
+  (e: "changed", file: File[]): void,
+  (e: "modal-close"): void,
+}>();
+
+watch(files, (newFile)=> {
+  emit("changed", newFile);
+});
 const target = ref(null)
 const dropContainer = useTemplateRef<HTMLLabelElement>('drop-container')
 const fileInput = useTemplateRef<HTMLInputElement>('file-input')
+
+function handleFileSelect(e: Event) {
+  const input = e.target as HTMLInputElement;
+  const filesAsArray = Array.from(input?.files || []);
+  files.value = files.value.concat(filesAsArray);
+}
+
+function removeFile(index: number) {
+  files.value.splice(index, 1);
+}
+
+function upload() {
+  const filesAsArray = Array.from(fileInput.value?.files || []);
+  for (let i = 0; i < filesAsArray.length; i++) {
+    const file = filesAsArray[i]
+    const r = new Resumable({
+      headers: {
+        Authorization: store.getBearerToken,
+      },
+      target: 'http://127.0.0.1:8000/api/upload-files',
+      chunkSize: 1024 * 1024,
+      testChunks: false,
+    })
+    r.addFile(file)
+    r.on('fileAdded', () => {r.upload()})
+  }
+}
 
 defineExpose({
   dropContainer, fileInput
@@ -28,7 +67,7 @@ defineExpose({
         <label ref="drop-container" for="images" class="drop-container" id="drop-container">
           <span class="drop-title">Déposer vos fichiers</span>
           ou
-          <input ref="file-input" type="file" id="images[]" accept="image/*" multiple>
+          <input @change="handleFileSelect" ref="file-input" type="file" id="images[]" accept="image/*" multiple>
         </label>
         <div class="modal-footer">
           <slot name="footer"></slot>
@@ -37,11 +76,18 @@ defineExpose({
               type="button"
               class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
               @click.stop="emit('modal-close')"
+              @click.prevent="upload"
             >
               Submit
             </button>
           </div>
         </div>
+        <ul>
+          <li v-for="(file, index) in files" :key="file.name">
+            {{ file.name}}
+            <button @click="removeFile(index)">X</button>
+          </li>
+        </ul>
       </div>
     </div>
   </div>

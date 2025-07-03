@@ -1,5 +1,14 @@
 import { defineStore } from 'pinia'
 
+interface User {
+  id: string,
+  email: string,
+  name: string,
+  remember_token: string,
+  created_at: string,
+  updated_at: string,
+}
+
 export const useUserStore = defineStore('user', {
   state: () => {
     return {
@@ -7,17 +16,18 @@ export const useUserStore = defineStore('user', {
       userToken: '',
       userId: '',
       userBearerToken: '',
+      user: null as User|null,
     }
   },
   getters: {
     getUserId(): string {
       return this.userId
     },
-    getUser(state) {
-      return state
-    },
     getBearerToken(): string {
       return this.userBearerToken
+    },
+    getUser(): User|null {
+      return this.user
     }
   },
   actions: {
@@ -30,9 +40,13 @@ export const useUserStore = defineStore('user', {
     setBearerToken(token: string) {
       this.userBearerToken = `Bearer ${token}`
     },
+    setUser(User: User|null): void {
+      this.user = User
+    },
     logout() {
       this.userToken = ''
       this.userId = ''
+      this.userBearerToken = ''
     }
   }
 })

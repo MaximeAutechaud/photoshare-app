@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios'
+import router from '@/router'
 
 interface SignupForm {
   name: string
@@ -43,6 +44,7 @@ function signup() {
     password_confirmation: form.passwordConfirm,
   }).then(function (response) {
     console.log(response);
+    router.push('home');
     // se connecter + rediriger sur home
   }).catch(function (error) {
     console.log(error);

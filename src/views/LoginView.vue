@@ -21,7 +21,10 @@ function login() {
   }).then(function (response) {
     store.setToken(response.data.token);
     store.setUserId(response.data.user.id);
-    router.push('home');
+    store.setBearerToken(response.data.token);
+    store.setUser(response.data.user);
+    console.log(store.getUser)
+    router.push('/');
   }).catch(function (error) {
     console.log(error);
   })

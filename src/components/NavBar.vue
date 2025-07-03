@@ -8,7 +8,7 @@ function logout() {
   const user = store.getUser
   axios.post('http://127.0.0.1:8000/api/logout', {
     params: {
-      user_id: user.userId
+      user_id: user!.id
     },
     headers: {
       Authorization: store.getBearerToken,
