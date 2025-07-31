@@ -2,6 +2,7 @@
 import Resumable from 'resumablejs';
 import { defineProps, defineEmits, ref, useTemplateRef, watch } from 'vue'
 import { useUserStore } from '@/stores/user.ts'
+import InputFile from '@/components/InputFile.vue'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -9,7 +10,12 @@ const props = defineProps({
 
 const files = ref<File[]>([]);
 const store = useUserStore();
+const selectedFiles = ref<File[]>([])
 
+function onFilesSelected(files: File[]) {
+  console.log('Fichiers sélectionnés :', files)
+  selectedFiles.value = files
+}
 //const emit = defineEmits(['modal-close', (e: "changed", file: File[]): void])
 const emit = defineEmits<{
   (e: "changed", file: File[]): void,
@@ -69,18 +75,20 @@ defineExpose({
           ou
           <input @change="handleFileSelect" ref="file-input" type="file" id="images[]" accept="image/*" multiple>
         </label>
+        <InputFile accept="image/*" :multiple="true" @update:files="onFilesSelected"/>
         <div class="modal-footer">
-          <slot name="footer"></slot>
-          <div>
-            <button
-              type="button"
-              class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
-              @click.stop="emit('modal-close')"
-              @click.prevent="upload"
-            >
-              Submit
-            </button>
-          </div>
+          <slot name="footer">
+            <div>
+              <button
+                type="button"
+                class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+                @click.stop="emit('modal-close')"
+                @click.prevent="upload"
+              >
+                Submit
+              </button>
+            </div>
+          </slot>
         </div>
         <ul>
           <li v-for="(file, index) in files" :key="file.name">

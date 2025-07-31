@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import ModalItem from '@/components/ModalItem.vue'
-import { ref, onMounted, useTemplateRef, onUpdated } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user.ts'
 import axios from 'axios'
+import Gallery from '@/components/Gallery.vue'
 
 const isModalOpened = ref<boolean>(false)
 
 const store = useUserStore();
 const user = store.getUser;
-let medias = [];
+const medias = ref<any[]>([]);
+const loading = ref(true);
+const error = ref<string | null>(null);
 
 const openModal = () => {
   isModalOpened.value = true
@@ -20,30 +23,10 @@ const closeModal = () => {
 const submitHandler = () => {
   //here you do whatever
 }
-const modalRef = useTemplateRef("modal-ref")
-onMounted(() => {
+onMounted(async() => {
   fetchGallery();
 })
-onUpdated(() => {
-  if (modalRef.value?.dropContainer) {
-    modalRef.value.dropContainer.addEventListener('dragover', (e) => {
-      e.preventDefault();
-    }, false);
-    modalRef.value.dropContainer.addEventListener('dragenter', () => {
-      modalRef.value.dropContainer.classList.add('drag-active');
-    })
-    modalRef.value.dropContainer.addEventListener('dragenter', () => {
-      modalRef.value.dropContainer.classList.remove('drag-active');
-    })
-    if (modalRef.value?.fileInput) {
-      modalRef.value.dropContainer.addEventListener('drop', (e) => {
-        e.preventDefault();
-        modalRef.value.dropContainer.classList.remove('drag-active');
-        modalRef.value.fileInput = e.dataTransfer.files;
-      })
-    }
-  }
-})
+
 function fetchGallery() {
   axios.get('http://127.0.0.1:8000/api/fetch-gallery', {
     headers: {
@@ -52,10 +35,13 @@ function fetchGallery() {
     }
   })
     .then(function (response) {
-      medias = response.data;
+      medias.value = response.data;
       console.log(response.data)
   }).catch(function (error) {
+    error.value = 'Erreur lors du chargement des données'
     console.log(error);
+  }).finally(function () {
+    loading.value = false
   })
 }
 </script>
@@ -81,16 +67,13 @@ function fetchGallery() {
       ref="modal-ref"
     >
     </ModalItem>
-    <div v-for="media in medias" v-bind:key="media.id">
-      <div v-if="media.mime_type.startsWith('image')" >
-        <p>{{ media.name }}</p>
-        <img :src="media.s3_url" alt="Image" class="rounded shadow mb-2 w-full max-w-md">
-      </div>
+    <div>
+      <div v-if="loading">Chargement...</div>
+      <div v-else-if="error">{{ error }}</div>
       <div v-else>
-        <p>{{ media.name }}</p>
-        <video controls class="rounded shadow w-full max-w-sm">
-          <source :src="media.s3_url" :type="media.mime_type" />
-        </video>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
+          <Gallery :medias="medias"/>
+        </div>
       </div>
     </div>
   </div>
