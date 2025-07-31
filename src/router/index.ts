@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import { useUserStore } from '@/stores/user.ts'
+import { useAuthStore } from '@/stores/auth.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,14 +40,9 @@ const router = createRouter({
   ],
 })
 router.beforeEach((to, from, next) => {
-  if (to.meta.requireAuth) {
-    const store = useUserStore()
-    const token: string = store.$state.userToken
-    if (token === "") {
-      next({name: 'login'});
-    } else {
-      next()
-    }
+  const auth = useAuthStore()
+  if (to.meta.requireAuth && !auth.isAuthenticated) {
+    next('/login')
   } else {
     next();
   }

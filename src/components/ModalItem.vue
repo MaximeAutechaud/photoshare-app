@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Resumable from 'resumablejs';
 import { defineProps, defineEmits, ref, useTemplateRef, watch } from 'vue'
-import { useUserStore } from '@/stores/user.ts'
+import { useAuthStore } from '@/stores/auth.ts'
 import InputFile from '@/components/InputFile.vue'
 
 const props = defineProps({
@@ -9,7 +9,7 @@ const props = defineProps({
 })
 
 const files = ref<File[]>([]);
-const store = useUserStore();
+const auth = useAuthStore();
 const selectedFiles = ref<File[]>([])
 
 function onFilesSelected(files: File[]) {
@@ -45,7 +45,7 @@ function upload() {
     const file = filesAsArray[i]
     const r = new Resumable({
       headers: {
-        Authorization: store.getBearerToken,
+        Authorization: auth.getBearerToken,
       },
       target: 'http://127.0.0.1:8000/api/upload-files',
       chunkSize: 1024 * 1024,
@@ -62,7 +62,7 @@ defineExpose({
 </script>
 
 <template>
-  <div v-if="isOpen" class="modal-mask">
+  <div v-if="props.isOpen" class="modal-mask">
     <div class="modal-wrapper">
       <div class="modal-container" ref="target">
         <div class="flex items-center justify-end" @click.stop="emit('modal-close')">

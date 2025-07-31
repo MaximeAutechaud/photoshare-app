@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import ModalItem from '@/components/ModalItem.vue'
 import { ref, onMounted } from 'vue'
-import { useUserStore } from '@/stores/user.ts'
-import axios from 'axios'
+import { useAuthStore } from '@/stores/auth.ts'
+import api from '@/lib/axios.ts'
 import Gallery from '@/components/Gallery.vue'
 
 const isModalOpened = ref<boolean>(false)
 
-const store = useUserStore();
-const user = store.getUser;
+const auth = useAuthStore();
+const user = auth.getUser;
 const medias = ref<any[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -28,12 +28,7 @@ onMounted(async() => {
 })
 
 function fetchGallery() {
-  axios.get('http://127.0.0.1:8000/api/fetch-gallery', {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': store.getBearerToken,
-    }
-  })
+  api.get('api/fetch-gallery')
     .then(function (response) {
       medias.value = response.data;
       console.log(response.data)
@@ -42,7 +37,7 @@ function fetchGallery() {
     console.log(error);
   }).finally(function () {
     loading.value = false
-  })
+    })
 }
 </script>
 

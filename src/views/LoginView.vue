@@ -1,51 +1,29 @@
 <script setup lang="ts">
-import axios from 'axios'
-import { useUserStore } from '@/stores/user.ts'
-import router from '@/router'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
-interface LoginForm {
-  email: string;
-  password: string;
-  errors: string[];
-}
-const form:LoginForm = {
-  email: '',
-  password: '',
-  errors: []
-}
-const store = useUserStore()
-function login() {
-  axios.post('http://127.0.0.1:8000/api/login', {
-    email: form.email,
-    password: form.password,
-  }).then(function (response) {
-    store.setToken(response.data.token);
-    store.setUserId(response.data.user.id);
-    store.setBearerToken(response.data.token);
-    store.setUser(response.data.user);
-    console.log(store.getUser)
-    router.push('/');
-  }).catch(function (error) {
-    console.log(error);
-  })
+const email = ref('')
+const password = ref('')
+const router = useRouter()
+const auth = useAuthStore()
+
+async function handleLogin() {
+  const success = await auth.login(email.value, password.value)
+  if (success) {
+    console.log('ici')
+    await router.push('/')
+  }
 }
 </script>
 
 <template>
-<h1>Login view</h1>
-<div>
-  <form @submit.prevent="login">
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input v-model="form.email" class="border border-blue-2" name="email" id="email" type="email" />
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input v-model="form.password" class="border border-blue-2" name="password" id="password" />
-    </div>
-    <input type="submit" value="Login">
+  <form @submit.prevent="handleLogin" class="max-w-md mx-auto mt-10">
+    <input v-model="email" type="email" required class="border p-2 mb-3 w-full" placeholder="Email" />
+    <input v-model="password" type="password" required class="border p-2 mb-3 w-full" placeholder="Mot de passe" />
+    <button type="submit" class="w-full bg-blue-600 text-white py-2">Connexion</button>
+    <p v-if="auth.error" class="text-red-500 mt-2">{{ auth.error }}</p>
   </form>
-</div>
 </template>
 
 <style scoped>

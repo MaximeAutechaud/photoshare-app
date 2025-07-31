@@ -1,24 +1,14 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import axios from 'axios'
-import { useUserStore } from '@/stores/user.ts'
+import { useAuthStore } from '@/stores/auth.ts'
 import router from '@/router'
-function logout() {
-  const store = useUserStore();
-  const user = store.getUser
-  axios.post('http://127.0.0.1:8000/api/logout', {
-    params: {
-      user_id: user!.id
-    },
-    headers: {
-      Authorization: store.getBearerToken,
-      Accept: 'application/json'
-    },
-  }).then(function() {
-    store.logout();
-    router.push('login');
-  }).catch(res => console.log(res))
+const auth = useAuthStore()
+const user = auth.getUser;
+async function handleLogout() {
+  auth.logout(user)
+  await router.push('login')
 }
+
 </script>
 <template>
   <nav>
@@ -27,7 +17,7 @@ function logout() {
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/gallery">Gallery</RouterLink>
       <RouterLink to="/profil">Profil</RouterLink>
-      <button class="cursor-pointer" type="button" @click="logout">Logout</button>
+      <button class="cursor-pointer" type="button" @click="handleLogout">Logout</button>
     </div>
   </nav>
 </template>

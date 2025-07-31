@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import { useUserStore } from '@/stores/user.ts'
 
-const store = useUserStore()
 </script>
 <template>
   <div>
