@@ -1,73 +1,3 @@
-<template>
-  <div>
-    <!-- Zone de drop -->
-    <div
-      class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center cursor-pointer transition-colors hover:bg-gray-50"
-      :class="{ 'bg-blue-50 border-blue-400': isDragging }"
-      @dragover.prevent="onDragOver"
-      @dragleave.prevent="onDragLeave"
-      @drop.prevent="onDrop"
-      @click="openFileDialog"
-    >
-      <div class="flex flex-col items-center space-y-2">
-        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M3 16l4-4a4 4 0 015.657 0l2.343 2.343a2 2 0 002.828 0L21 9m-9 11v-6" />
-        </svg>
-        <p class="text-gray-600">
-          Glissez vos fichiers ici ou <span class="text-blue-600 underline">cliquez</span>
-        </p>
-        <input
-          ref="inputRef"
-          type="file"
-          class="hidden"
-          :multiple="multiple"
-          :accept="accept"
-          @change="onFileChange"
-        />
-      </div>
-    </div>
-
-    <!-- Fichiers sélectionnés -->
-    <div v-if="files.length" class="mt-4 space-y-4 text-sm text-gray-700">
-      <div
-        v-for="(fileObj, index) in files"
-        :key="index"
-        class="flex items-start gap-4 bg-gray-100 p-3 rounded-xl shadow-sm"
-      >
-        <!-- Thumbnail -->
-        <div class="w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-white border">
-          <img
-            v-if="fileObj.preview"
-            :src="fileObj.preview"
-            alt="preview"
-            class="object-cover w-full h-full"
-          />
-          <div v-else class="flex items-center justify-center h-full text-gray-400 text-xs">
-            No preview
-          </div>
-        </div>
-
-        <!-- File Info -->
-        <div class="flex-1">
-          <div class="flex justify-between">
-            <span class="font-medium truncate">{{ fileObj.file.name }}</span>
-            <span class="text-xs text-gray-500">{{ formatSize(fileObj.file.size) }}</span>
-          </div>
-
-          <!-- Progress Bar -->
-          <div class="mt-2 w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-            <div
-              class="bg-blue-500 h-full transition-all duration-300"
-              :style="{ width: fileObj.progress + '%' }"
-            ></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, onUnmounted } from 'vue'
 
@@ -146,9 +76,85 @@ function formatSize(bytes: number): string {
   return `${size} ${sizes[i]}`
 }
 
+function removeFile(index: number) {
+  files.value.splice(index, 1)
+}
+
 // Cleanup previews and intervals
 onUnmounted(() => {
   files.value.forEach(f => f.preview && URL.revokeObjectURL(f.preview))
   intervals.forEach(id => clearInterval(id))
 })
 </script>
+
+<template>
+  <div>
+    <!-- Zone de drop -->
+    <div
+      class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center cursor-pointer transition-colors hover:bg-gray-50"
+      :class="{ 'bg-blue-50 border-blue-400': isDragging }"
+      @dragover.prevent="onDragOver"
+      @dragleave.prevent="onDragLeave"
+      @drop.prevent="onDrop"
+      @click="openFileDialog"
+    >
+      <div class="flex flex-col items-center space-y-2">
+        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 16l4-4a4 4 0 015.657 0l2.343 2.343a2 2 0 002.828 0L21 9m-9 11v-6" />
+        </svg>
+        <p class="text-gray-600">
+          Glissez vos fichiers ici ou <span class="text-blue-600 underline">cliquez</span>
+        </p>
+        <input
+          ref="inputRef"
+          type="file"
+          class="hidden"
+          :multiple="multiple"
+          :accept="accept"
+          @change="onFileChange"
+        />
+      </div>
+    </div>
+
+    <!-- Fichiers sélectionnés -->
+    <div v-if="files.length" class="mt-4 space-y-4 text-sm text-gray-700">
+      <div
+        v-for="(fileObj, index) in files"
+        :key="index"
+        class="flex items-start gap-4 bg-gray-100 p-3 rounded-xl shadow-sm"
+      >
+        <!-- Thumbnail -->
+        <div class="w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-white border">
+          <img
+            v-if="fileObj.preview"
+            :src="fileObj.preview"
+            alt="preview"
+            class="object-cover w-full h-full"
+          />
+          <div v-else class="flex items-center justify-center h-full text-gray-400 text-xs">
+            No preview
+          </div>
+        </div>
+
+        <!-- File Info -->
+        <div class="flex-1">
+          <div class="flex justify-between">
+            <span class="font-medium truncate">{{ fileObj.file.name }}</span>
+            <span class="text-xs text-gray-500">{{ formatSize(fileObj.file.size) }}</span>
+            <span class="text-xs text-gray-500 cursor-pointer" @click="removeFile(index)">X</span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="mt-2 w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+            <div
+              class="bg-blue-500 h-full transition-all duration-300"
+              :style="{ width: fileObj.progress + '%' }"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+

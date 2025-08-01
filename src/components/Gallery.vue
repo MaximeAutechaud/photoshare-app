@@ -1,24 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { Media } from '@/interfaces/media.ts'
 
 const props = defineProps<{
   medias: Media[]
 }>()
-
-interface Media {
-  id: number
-  name: string
-  user_id: number
-  s3_url: string
-  taken_at: Date | null
-  height: number | null
-  width: number | null
-  mime_type: string
-  size: number | null
-  created_at: Date | null
-  updated_at: Date | null
-  deleted_at: Date | null
-}
 
 const lightboxActive = ref<boolean>(false)
 const currentIndex = ref<number>(0)
@@ -77,9 +63,18 @@ function next() {
     @click.self="closeLightbox"
   >
     <img
+      v-if="medias[currentIndex].mime_type.startsWith('image')"
       :src="medias[currentIndex].s3_url"
       class="max-h-[90vh] max-w-[90vw] rounded-xl shadow-xl transition-opacity duration-300"
+      :alt="medias[currentIndex].name"
     />
+    <video
+      v-else
+      controls
+      class="w-full h-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105"
+    >
+      <source :src="medias[currentIndex].s3_url" :type="medias[currentIndex].mime_type" />
+    </video>
     <button class="absolute top-4 right-4 text-white text-2xl font-bold" @click="closeLightbox">
       ✕
     </button>

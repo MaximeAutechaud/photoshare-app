@@ -1,14 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '@/lib/axios.ts'
-
-interface User {
-  id: string,
-  email: string,
-  name: string,
-  remember_token: string,
-  created_at: string,
-  updated_at: string,
-}
+import type { User } from '@/interfaces/user.ts'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -54,14 +46,15 @@ export const useAuthStore = defineStore('auth', {
         const response = api.post('/api/logout', {
           user_id: user.id
         })
+        console.log(response)
+      } catch (err) {
+        console.error(err)
+      } finally {
         this.token = null
         this.user = null
         this.bearerToken = ''
         localStorage.removeItem('token')
         delete api.defaults.headers.common['Authorization']
-        console.log(response)
-      } catch (err) {
-        console.error(err)
       }
 
     },

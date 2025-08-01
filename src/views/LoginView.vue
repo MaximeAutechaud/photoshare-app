@@ -11,7 +11,6 @@ const auth = useAuthStore()
 async function handleLogin() {
   const success = await auth.login(email.value, password.value)
   if (success) {
-    console.log('ici')
     await router.push('/')
   }
 }

@@ -4,12 +4,13 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.ts'
 import api from '@/lib/axios.ts'
 import Gallery from '@/components/Gallery.vue'
+import type { Media } from '@/interfaces/media.ts'
 
 const isModalOpened = ref<boolean>(false)
 
 const auth = useAuthStore();
 const user = auth.getUser;
-const medias = ref<any[]>([]);
+const medias = ref<Media[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
