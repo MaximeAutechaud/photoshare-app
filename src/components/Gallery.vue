@@ -39,11 +39,16 @@ function next() {
       @click="openLightbox(index)"
     >
       <p>{{ media.name }}</p>
-      <img
-        :src="media.s3_url"
-        alt="Image"
-        class="w-full h-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105"
-      />
+      <div>
+        <img
+          :src="media.s3_url"
+          alt="Image"
+          class="w-full h-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105"
+        />
+        <div class="absolute">
+          X
+        </div>
+      </div>
     </div>
     <div v-else>
       <p>{{ media.name }}</p>

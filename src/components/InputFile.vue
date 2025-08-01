@@ -118,11 +118,11 @@ onUnmounted(() => {
     </div>
 
     <!-- Fichiers sélectionnés -->
-    <div v-if="files.length" class="mt-4 space-y-4 text-sm text-gray-700">
+    <div v-if="files.length" class="mt-4 max-h-[40vh] space-y-4 text-sm text-gray-700 overflow-y-auto flex-1">
       <div
         v-for="(fileObj, index) in files"
         :key="index"
-        class="flex items-start gap-4 bg-gray-100 p-3 rounded-xl shadow-sm"
+        class="flex items-start gap-4 bg-gray-100 p-3 rounded-xl shadow-sm max-h-[500px]"
       >
         <!-- Thumbnail -->
         <div class="w-16 h-16 flex-shrink-0 rounded-md overflow-hidden bg-white border">

@@ -58,7 +58,7 @@ defineExpose({
 <template>
   <div v-if="props.isOpen" class="modal-mask">
     <div class="modal-wrapper" >
-      <div class="modal-container rounded-xl" ref="target">
+      <div class="modal-container rounded-xl max-h-[80vh]" ref="target">
         <div class="flex items-center justify-end" @click.stop="emit('modal-close')">
           <div class="exit mb-4 cursor-pointer text-right font-600 text-xl">
             <span>X</span>
