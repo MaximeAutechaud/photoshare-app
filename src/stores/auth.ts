@@ -22,7 +22,7 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true
       this.error = null
       try {
-        const response = await api.post('/api/login', { email, password })
+        const response = await api.post('/login', { email, password })
         this.token = response.data.token
         this.user = response.data.user
         this.bearerToken = `Bearer ${this.token}`
@@ -63,7 +63,7 @@ export const useAuthStore = defineStore('auth', {
     async fetchUser() {
       if (!this.token) return
       try {
-        const res = await api.get('/api/me')
+        const res = await api.get('/me')
         this.user = res.data
       } catch {
         //logout

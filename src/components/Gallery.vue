@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { Media } from '@/interfaces/media.ts'
+import api from '@/lib/axios.ts'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 
 const props = defineProps<{
   medias: Media[]
@@ -8,6 +10,13 @@ const props = defineProps<{
 
 const lightboxActive = ref<boolean>(false)
 const currentIndex = ref<number>(0)
+const showModal = ref<boolean>(false)
+
+function handleDelete(media: Media) {
+  console.log('✅ Élément supprimé')
+  destroy(media.id)
+  showModal.value = false
+}
 
 function openLightbox(index: number) {
   currentIndex.value = index
@@ -29,6 +38,17 @@ function next() {
     currentIndex.value++
   }
 }
+
+function confirmeDestroy(media: Media) {
+  if (confirm('Voulez-vous vraiment supprimer ' + media.name + " ?")) {
+    destroy(media.id)
+  }
+}
+
+function destroy(media_id: number) {
+  api.delete('destroy-file/' + media_id
+  )
+}
 </script>
 
 <template>
@@ -39,14 +59,22 @@ function next() {
       @click="openLightbox(index)"
     >
       <p>{{ media.name }}</p>
-      <div>
+      <div class="relative group">
         <img
           :src="media.s3_url"
           alt="Image"
           class="w-full h-full object-cover aspect-square transition-transform duration-300 group-hover:scale-105"
         />
-        <div class="absolute">
-          X
+        <div
+          class="group absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        >
+          <button
+            @click.stop="showModal = true"
+            class="bg-white text-gray-800 px-2 py-1 text-sm rounded shadow hover:bg-gray-100"
+          >
+            ✕
+          </button>
+          <ConfirmModal :visible="showModal" @confirm="handleDelete(media)" @cancel="showModal = false" /> />
         </div>
       </div>
     </div>

@@ -29,7 +29,7 @@ onMounted(async() => {
 })
 
 function fetchGallery() {
-  api.get('api/fetch-gallery')
+  api.get('fetch-gallery')
     .then(function (response) {
       medias.value = response.data;
       console.log(response.data)
