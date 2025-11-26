@@ -4,12 +4,13 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.ts'
 import api from '@/lib/axios.ts'
 import Gallery from '@/components/Gallery.vue'
+import type { Media } from '@/interfaces/media.ts'
 
 const isModalOpened = ref<boolean>(false)
 
 const auth = useAuthStore();
 const user = auth.getUser;
-const medias = ref<any[]>([]);
+const medias = ref<Media[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
@@ -28,7 +29,7 @@ onMounted(async() => {
 })
 
 function fetchGallery() {
-  api.get('api/fetch-gallery')
+  api.get('fetch-gallery')
     .then(function (response) {
       medias.value = response.data;
       console.log(response.data)
@@ -42,9 +43,8 @@ function fetchGallery() {
 </script>
 
 <template>
-  <div class="mt-20">
-    <h2 class="text-3xl">This is Home view</h2>
-    <p>Bonjour {{ user.name }}</p>
+  <div class="mt-10">
+    <h2 class="text-3xl text-center mb-10">Bonjour {{ user.name }} !</h2>
     <div class="text-center">
       <button
         @click="openModal"
@@ -73,21 +73,4 @@ function fetchGallery() {
     </div>
   </div>
 </template>
-<style>
-input[type=file] {
-  color: #222245;
-  padding: 8px 12px;
-  background-color: #fff;
-  border: 1px solid #222245;
-}
-input[type=file]::file-selector-button {
-  margin-right: 8px;
-  border: none;
-  background: #084cdf;
-  padding: 8px 12px;
-  color: #fff;
-  cursor: pointer;
-}
-
-
-</style>
+<style scoped></style>

@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import { useAuthStore } from '@/stores/auth.ts'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
@@ -49,7 +49,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore()
   if (to.meta.requireAuth && !auth.isAuthenticated) {
-    next('/login')
+    next('login')
   } else {
     next();
   }
