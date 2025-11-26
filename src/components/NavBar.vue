@@ -1,14 +1,24 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { useAuthStore } from '@/stores/auth.ts'
 import router from '@/router'
-const auth = useAuthStore()
-const user = auth.getUser;
+import { useAuth } from '@websanova/vue-auth'
+interface User {
+  id: string,
+  email: string,
+  name: string,
+  remember_token: string,
+  created_at: string,
+  updated_at: string,
+}
+const props = defineProps({
+  user: { type: Object },
+})
+const auth = useAuth()
 async function handleLogout() {
-  auth.logout(user)
+  await auth.logout(user)
   await router.push('login')
 }
-
+console.log(props)
 </script>
 <template>
   <nav>

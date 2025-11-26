@@ -12,11 +12,13 @@ interface User {
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: localStorage.getItem('token') as string | null,
-    bearerToken: '' as string,
-    user: null as User|null,
-    error: null as string | null,
-    loading: false
+    currentUser: {
+      token: localStorage.getItem('token') as string | null,
+      bearerToken: '' as string,
+      user: null as User|null,
+      error: null as string | null,
+      loading: false
+    }
   }),
 
   getters: {
